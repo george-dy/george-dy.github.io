@@ -1,0 +1,229 @@
+{
+  "format": "exam-bank",
+  "version": 1,
+  "bankId": "bank-example0001",
+  "title": "Example Bank (documentation fixture)",
+  "generatedAt": "2026-01-01T00:00:00.000Z",
+  "generator": "hand-written example for SCHEMA.md",
+  "documents": [
+    {
+      "file": "Week 1.docx",
+      "title": "Week 1 Practice Examinations",
+      "description": "Illustrative fixture.",
+      "importedAt": "2026-01-01T00:00:00.000Z",
+      "paragraphCount": 42,
+      "setIds": [
+        "week-1-docx--s1-form-a",
+        "week-1-docx--s2-form-b"
+      ]
+    }
+  ],
+  "sets": [
+    {
+      "id": "week-1-docx--s1-form-a",
+      "title": "Form A - 2 Items",
+      "sourceFile": "Week 1.docx",
+      "documentTitle": "Week 1 Practice Examinations",
+      "description": "Provider-level scenarios.",
+      "questionIds": [
+        "week-1-docx--s1-form-a--q001",
+        "week-1-docx--s1-form-a--q002"
+      ],
+      "metadata": {
+        "setIndex": 1,
+        "headingText": "Form A - 2 Items",
+        "detectedBy": [
+          "heading"
+        ],
+        "confidence": "high",
+        "autoTitle": false
+      }
+    },
+    {
+      "id": "week-1-docx--s2-form-b",
+      "title": "Form B - 1 Item",
+      "sourceFile": "Week 1.docx",
+      "documentTitle": "Week 1 Practice Examinations",
+      "description": "",
+      "questionIds": [
+        "week-1-docx--s2-form-b--q001"
+      ],
+      "metadata": {
+        "setIndex": 2,
+        "headingText": "Form B - 1 Item",
+        "detectedBy": [
+          "heading"
+        ],
+        "confidence": "high",
+        "autoTitle": false
+      }
+    }
+  ],
+  "questions": [
+    {
+      "id": "week-1-docx--s1-form-a--q001",
+      "setId": "week-1-docx--s1-form-a",
+      "sourceFile": "Week 1.docx",
+      "questionNumber": 1,
+      "ordinal": 1,
+      "type": "mc",
+      "stem": [
+        "A 26-month-old insists on putting on shoes independently and protests when helped.",
+        "Mastery of this developmental task yields which virtue?"
+      ],
+      "images": [
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHgAAAA8CAIAAAAiz+n/AAAA1ElEQVR4nO3coQ3CUBRAUUrYh6XYAs0WLMUmCAQSgSwfTLlN4BzZmp/bl29e0ul6u2/4vu3aB/gXQkeEjggdEToidEToyG70Yn88lOf4JZfTef7QREeGE/308uMw8uYaMNERoSNCR4SOCB0ROiJ0ROiI0BGhI0JHhI4IHRE6InRE6IjQEaEjQkc+7AztwpdioiO24EuyBV+f0BGhI0JHhI4IHRE6InRE6IjQEaEjQkeEjggdEToidEToiNARy9mIiY5Mfl7VMNERoSNCR4SOCB0ROvIADaMRVcIAcsQAAAAASUVORK5CYII=",
+          "alt": "Figure 1: simplified growth chart.",
+          "caption": "Figure 1: simplified growth chart.",
+          "position": "stem",
+          "sourceName": "image1.png",
+          "contentType": "image/png",
+          "widthPx": 120,
+          "heightPx": 60
+        }
+      ],
+      "options": [
+        {
+          "label": "A",
+          "text": "Will, via autonomy versus shame and doubt",
+          "isCorrect": true,
+          "rationale": "The toddler stage (1-3 years) centers on autonomy versus shame and doubt; the virtue is will."
+        },
+        {
+          "label": "B",
+          "text": "Competence, via industry versus inferiority",
+          "isCorrect": false,
+          "rationale": "Industry versus inferiority describes school-age children (5-11 years)."
+        },
+        {
+          "label": "C",
+          "text": "Purpose, via initiative versus guilt",
+          "isCorrect": false,
+          "rationale": ""
+        },
+        {
+          "label": "D",
+          "text": "Hope, via trust versus mistrust",
+          "isCorrect": false,
+          "rationale": "Trust versus mistrust is the infancy crisis of the first year."
+        }
+      ],
+      "correctAnswers": [
+        "A"
+      ],
+      "sourceMapping": "Slide 3; Week 1 transcript",
+      "issues": [
+        "missing-rationale:C"
+      ],
+      "metadata": {
+        "headingSuffix": "Multiple Choice",
+        "contentHash": "example00000001"
+      }
+    },
+    {
+      "id": "week-1-docx--s1-form-a--q002",
+      "setId": "week-1-docx--s1-form-a",
+      "sourceFile": "Week 1.docx",
+      "questionNumber": 2,
+      "ordinal": 2,
+      "type": "sata",
+      "stem": [
+        "Which immunizations are due at the 12-month visit? Select all that apply."
+      ],
+      "options": [
+        {
+          "label": "A",
+          "text": "Hepatitis A dose 2",
+          "isCorrect": false,
+          "rationale": "Hepatitis A dose 2 follows dose 1 later in the schedule."
+        },
+        {
+          "label": "B",
+          "text": "PCV dose 4",
+          "isCorrect": true,
+          "rationale": "PCV 4 completes the series at 12-15 months."
+        },
+        {
+          "label": "C",
+          "text": "DTaP dose 5",
+          "isCorrect": false,
+          "rationale": "DTaP 5 belongs to the 4-6 year boosters."
+        },
+        {
+          "label": "D",
+          "text": "Varicella dose 1",
+          "isCorrect": true,
+          "rationale": "Varicella 1 is due at 12-15 months."
+        },
+        {
+          "label": "E",
+          "text": "MMR dose 1",
+          "isCorrect": true,
+          "rationale": "MMR 1 is due at 12-15 months."
+        }
+      ],
+      "correctAnswers": [
+        "B",
+        "D",
+        "E"
+      ],
+      "sourceMapping": "Slide 5",
+      "metadata": {
+        "headingSuffix": "Select All That Apply",
+        "contentHash": "example00000002"
+      }
+    },
+    {
+      "id": "week-1-docx--s2-form-b--q001",
+      "setId": "week-1-docx--s2-form-b",
+      "sourceFile": "Week 1.docx",
+      "questionNumber": 1,
+      "ordinal": 1,
+      "type": "open",
+      "title": "Card 1 - Scalp Examination",
+      "stem": [
+        "You palpate a soft, diffuse area of scalp swelling over the presenting part that crosses suture lines.",
+        "What is your interpretation? What management is indicated?"
+      ],
+      "options": [],
+      "correctAnswers": [],
+      "answerBlock": [
+        {
+          "text": "Answer source: Faculty Answer Key, Card 1.",
+          "bold": false,
+          "bullet": null
+        },
+        {
+          "text": "Expected diagnosis: Caput succedaneum",
+          "bold": false,
+          "bullet": null
+        },
+        {
+          "text": "Category: BENIGN/EXPECTED",
+          "bold": false,
+          "bullet": null
+        },
+        {
+          "text": "Key reasoning",
+          "bold": true,
+          "bullet": null
+        },
+        {
+          "text": "Soft, diffuse scalp edema.",
+          "bold": false,
+          "bullet": 0
+        },
+        {
+          "text": "Crosses suture lines.",
+          "bold": false,
+          "bullet": 0
+        }
+      ],
+      "metadata": {
+        "headingSuffix": "Card 1 - Scalp Examination",
+        "contentHash": "example00000003"
+      }
+    }
+  ]
+}

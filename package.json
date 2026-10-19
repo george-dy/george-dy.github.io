@@ -1,0 +1,15 @@
+{
+  "name": "exam-practice-platform",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Static practice examination platform for GitHub Pages (dev tooling only; the site itself has no build step)",
+  "scripts": {
+    "test": "node --test tests/",
+    "build": "node tools/build-bank.mjs && python3 tools/compress-assets.py"
+  },
+  "devDependencies": {
+    "jszip": "^3.10.1",
+    "@xmldom/xmldom": "^0.8.10",
+    "jsdom": "^24.0.0"
+  }
+}
