@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FNP Pediatric Practice Exam Portal</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col text-slate-800 antialiased selection:bg-indigo-500 selection:text-white">
+
+    <!-- Top Navigation Header -->
+    <header class="bg-indigo-700 text-white shadow-md sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="showDashboard()">
+                <div class="bg-white/10 p-2 rounded-lg border border-white/20">
+                    <i class="fa-solid fa-user-nurse text-xl text-indigo-200"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight">FNP Practice Portal</h1>
+                    <p class="text-xs text-indigo-200 hidden sm:block">Pediatric Health & Clinical Case Studies</p>
+                </div>
+            </div>
+
+            <!-- Header Quick Stats / Controls -->
+            <div id="header-controls" class="flex items-center space-x-4">
+                <button onclick="showDashboard()" id="home-btn" class="flex items-center space-x-2 text-sm bg-indigo-800/80 hover:bg-indigo-800 px-3 py-1.5 rounded-lg border border-indigo-500/40 transition">
+                    <i class="fa-solid fa-house text-indigo-300"></i>
+                    <span class="hidden md:inline font-medium">Dashboard</span>
+                </button>
+                <button onclick="confirmResetProgress()" class="text-xs text-indigo-200 hover:text-white underline transition">
+                    Reset All Data
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col">
+
+        <!-- ================= DASHBOARD SCREEN ================= -->
+        <section id="dashboard-view" class="space-y-6">
+            <!-- Hero Banner -->
+            <div class="bg-gradient-to-r from-indigo-800 via-indigo-700 to-blue-600 rounded-2xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
+                <div class="absolute -right-10 -bottom-10 opacity-10 text-9xl text-white pointer-events-none">
+                    <i class="fa-solid fa-stethoscope"></i>
+                </div>
+                <div class="max-w-2xl relative z-10">
+                    <span class="bg-indigo-500/30 text-indigo-100 text-xs font-semibold px-3 py-1 rounded-full border border-indigo-300/30 inline-block mb-3">2026 Board Review Standard</span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight">Pediatric Clinical Case Studies</h2>
+                    <p class="mt-2 text-indigo-100 text-sm sm:text-base leading-relaxed">
+                        Comprehensive practice board questions covering infant care, milestones, ADHD, lead toxicity, hyperbilirubinemia, and pediatric mental health.
+                    </p>
+                    <div class="mt-6 flex flex-wrap gap-4 text-xs font-medium text-indigo-100">
+                        <div class="flex items-center space-x-2 bg-black/20 px-3 py-1.5 rounded-lg backdrop-blur-sm">
+                            <i class="fa-solid fa-check-circle text-emerald-400"></i>
+                            <span id="overall-completed">0 / 74 Answered</span>
+                        </div>
+                        <div class="flex items-center space-x-2 bg-black/20 px-3 py-1.5 rounded-lg backdrop-blur-sm">
+                            <i class="fa-solid fa-bullseye text-amber-300"></i>
+                            <span id="overall-accuracy">Overall Accuracy: --%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-2">
+                <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fa-solid fa-layer-group text-indigo-600"></i> Available Question Sets
+                </h3>
+            </div>
+
+            <!-- Question Set Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="set-cards-container">
+                <!-- Dynamic Set Cards Injected Here via JS -->
+            </div>
+        </section>
+
+        <!-- ================= EXAM QUIZ SCREEN ================= -->
+        <section id="quiz-view" class="hidden flex-1 flex flex-col space-y-4">
+            <!-- Quiz Control & Header Bar -->
+            <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-4">
+                <div class="flex items-center space-x-3">
+                    <button onclick="showDashboard()" class="p-2 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition" title="Back to Sets">
+                        <i class="fa-solid fa-arrow-left text-lg"></i>
+                    </button>
+                    <div>
+                        <h2 id="quiz-set-title" class="font-bold text-slate-800 text-base sm:text-lg">Set Title</h2>
+                        <p id="quiz-progress-text" class="text-xs text-slate-500">Question 1 of 50</p>
+                    </div>
+                </div>
+
+                <!-- Navigation Controls -->
+                <div class="flex items-center space-x-2">
+                    <button id="prev-btn" onclick="navQuestion(-1)" class="px-3.5 py-2 text-sm font-medium bg-slate-100 text-slate-700 hover:bg-slate-200 rounded-lg transition flex items-center space-x-1.5 disabled:opacity-40 disabled:cursor-not-allowed">
+                        <i class="fa-solid fa-chevron-left text-xs"></i>
+                        <span>Prev</span>
+                    </button>
+                    <button id="next-btn" onclick="navQuestion(1)" class="px-3.5 py-2 text-sm font-medium bg-slate-100 text-slate-700 hover:bg-slate-200 rounded-lg transition flex items-center space-x-1.5 disabled:opacity-40 disabled:cursor-not-allowed">
+                        <span>Next</span>
+                        <i class="fa-solid fa-chevron-right text-xs"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quiz Main Body (Split into Left Sidebar Question Nav & Main Question Panel) -->
+            <div class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-0">
+
+                <!-- Left Column: Question Navigator Sidebar -->
+                <div class="lg:col-span-3 bg-white rounded-xl p-4 shadow-sm border border-slate-200 flex flex-col h-full max-h-[280px] lg:max-h-full">
+                    <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-100">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Question Grid</span>
+                        <span id="grid-score" class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">Score: 0/0</span>
+                    </div>
+                    <div id="question-grid" class="flex-1 overflow-y-auto custom-scrollbar grid grid-cols-5 sm:grid-cols-8 lg:grid-cols-4 gap-2 pr-1">
+                        <!-- Dynamic Grid Buttons -->
+                    </div>
+                </div>
+
+                <!-- Right Column: Active Question View -->
+                <div class="lg:col-span-9 bg-white rounded-xl p-6 shadow-sm border border-slate-200 flex flex-col overflow-y-auto custom-scrollbar">
+                    
+                    <!-- Question Header & Tag -->
+                    <div class="flex items-center justify-between gap-2 mb-4 pb-3 border-b border-slate-100">
+                        <span id="q-badge" class="bg-indigo-100 text-indigo-800 text-xs font-bold px-3 py-1 rounded-full">
+                            Question #1
+                        </span>
+                        <span id="q-status" class="text-xs font-semibold text-slate-400">Not Answered</span>
+                    </div>
+
+                    <!-- Question Stem -->
+                    <div id="q-text" class="text-slate-900 text-base sm:text-lg font-medium leading-relaxed mb-6">
+                        Loading question text...
+                    </div>
+
+                    <!-- Answer Choices Container -->
+                    <div id="options-container" class="space-y-3 mb-6">
+                        <!-- Dynamic Option Buttons Injected Here -->
+                    </div>
+
+                    <!-- Submit / Reset Action Bar -->
+                    <div id="action-bar" class="mb-6 flex items-center justify-between">
+                        <button id="submit-btn" onclick="submitAnswer()" disabled class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-semibold text-sm rounded-xl shadow-sm transition flex items-center space-x-2">
+                            <i class="fa-solid fa-paper-plane text-xs"></i>
+                            <span>Submit Answer</span>
+                        </button>
+                        <button id="clear-btn" onclick="resetCurrentQuestion()" class="hidden text-xs text-slate-500 hover:text-slate-800 underline">
+                            Clear My Selection
+                        </button>
+                    </div>
+
+                    <!-- Answer Rationale & Feedback Card (Hidden until submitted) -->
+                    <div id="rationale-box" class="hidden space-y-4 pt-4 border-t border-slate-200 animate-fadeIn">
+                        
+                        <!-- Correct/Incorrect Result Banner -->
+                        <div id="result-banner" class="p-4 rounded-xl flex items-start space-x-3">
+                            <i id="result-icon" class="fa-solid text-xl mt-0.5"></i>
+                            <div>
+                                <h4 id="result-title" class="font-bold text-sm sm:text-base">Verdict</h4>
+                                <p id="result-correct-answer" class="text-xs sm:text-sm font-medium mt-0.5">Correct Answer: B</p>
+                            </div>
+                        </div>
+
+                        <!-- Core Explanation & Rationale -->
+                        <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 space-y-3">
+                            <h5 class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+                                <i class="fa-solid fa-book-open text-indigo-600"></i> Rationale & Explanation
+                            </h5>
+                            <p id="rationale-text" class="text-sm text-slate-700 leading-relaxed">
+                                Rationale detail goes here.
+                            </p>
+                        </div>
+
+                        <!-- Key Exam Takeaway -->
+                        <div class="bg-amber-50/80 rounded-xl p-4 border border-amber-200/80 space-y-1.5">
+                            <h5 class="text-xs font-bold uppercase tracking-wider text-amber-800 flex items-center gap-1.5">
+                                <i class="fa-solid fa-lightbulb text-amber-600"></i> Exam Takeaway
+                            </h5>
+                            <p id="takeaway-text" class="text-sm text-amber-900 font-medium leading-relaxed">
+                                Exam takeaway summary text...
+                            </p>
+                        </div>
+
+                        <!-- Source Origin Citation -->
+                        <div class="bg-slate-100/70 rounded-lg p-3 text-xs text-slate-500 flex items-start space-x-2 border border-slate-200/60">
+                            <i class="fa-solid fa-bookmark text-slate-400 mt-0.5"></i>
+                            <div>
+                                <span class="font-semibold text-slate-600">Source Origin:</span>
+                                <span id="source-text" class="ml-1 italic">Slide citation source text...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- App Data & Logic -->
+    <script>
+        // Full Dataset of all 3 Question Sets
+        const EXAM_DATA = {
+            set1: {
+                id: 'set1',
+                title: 'Case Studies - Set 1',
+                subtitle: 'Questions 1–50 (Infant Care, ADHD, Jaundice, Lead & Development)',
+                description: 'Covers neonatal jaundice, umbilical granulomas, sacral dimples, GERD, dehydration, adolescent depression, and developmental milestones.',
+                questions: [
+                    {
+                        id: 1,
+                        question: "A 4-day-old newborn, born at 39 weeks gestation, is evaluated in the clinic for yellowing of the skin. The infant is exclusively breastfed, nursing 8 times per day, and has had two wet diapers and one small stool in the past 24 hours. Birth weight was 3200 g; current weight is 2950 g. The infant is alert, and vital signs are stable. Total serum bilirubin is 15.5 mg/dL.\n\nWhat is the most likely etiology of this infant's hyperbilirubinemia?",
+                        options: [
+                            "A. Breast milk jaundice due to factors in mature breast milk",
+                            "B. Suboptimal intake hyperbilirubinemia secondary to dehydration",
+                            "C. Hemolytic disease of the newborn causing rapid red cell breakdown",
+                            "D. Physiologic neonatal jaundice from immature hepatic conjugation"
+                        ],
+                        correctIndex: 1,
+                        correctKey: "B",
+                        rationale: "This infant is exhibiting signs of suboptimal intake (breastfeeding) jaundice, which typically occurs in the first week of life. The clinical picture includes inadequate stooling, decreased urine output, and excessive weight loss (approximately 8% in this case), leading to increased enterohepatic circulation of bilirubin.\n\nWhy the other options are less appropriate:\nA. Breast milk jaundice typically presents after the first week of life in infants who are feeding well, gaining weight appropriately, and have normal stool/urine output.\nC. Hemolytic disease usually presents with jaundice within the first 24 hours of life and a rapid rise in bilirubin, which is not described here.\nD. While physiologic jaundice is common, the excessive weight loss and decreased output point specifically to a caloric and fluid intake deficit exacerbating the hyperbilirubinemia.",
+                        takeaway: "Differentiate suboptimal intake jaundice (first week, weight loss, low output) from breast milk jaundice (after first week, thriving infant).",
+                        source: "4 - 2nd Half of Infant Lecture.pptx, Slide 3 (Hyperbilirubinemia in Infants — Quick Comparison)."
+                    },
+                    {
+                        id: 2,
+                        question: "A 3-week-old infant is brought to the clinic because the umbilical stump fell off a week ago, but the area remains moist. On examination, there is a small, soft, pink nodule at the base of the umbilicus with a small amount of clear, yellowish drainage. The surrounding skin is normal in color, and the infant is afebrile and feeding well.\n\nWhat is the most appropriate next step in management?",
+                        options: [
+                            "A. Initiate oral broad-spectrum antibiotics and monitor closely",
+                            "B. Apply silver nitrate to the granulation tissue",
+                            "C. Obtain an ultrasound of the umbilicus to rule out a patent urachus",
+                            "D. Reassure the parents that this is a normal finding that will resolve spontaneously"
+                        ],
+                        correctIndex: 1,
+                        correctKey: "B",
+                        rationale: "The presentation is classic for an umbilical granuloma, which is persistent granulation tissue after cord separation. It is characterized by a small, moist, pink/red nodule with clear or yellow serous drainage, lacking surrounding erythema or systemic signs of infection. Silver nitrate application is the standard first-line treatment.\n\nWhy the other options are less appropriate:\nA. Oral antibiotics are indicated for omphalitis, which would present with surrounding erythema, purulent/foul-smelling drainage, and potential systemic signs (fever, lethargy).\nC. Ultrasound is not routinely indicated for a classic, uncomplicated granuloma unless there is suspicion for an underlying anatomical anomaly (e.g., patent omphalomesenteric duct or urachus) that fails to respond to standard therapy.\nD. While small granulomas may occasionally resolve, standard management involves chemical cauterization with silver nitrate to prevent prolonged drainage and secondary infection.",
+                        takeaway: "Distinguish umbilical granuloma (pink nodule, clear drainage, no erythema) from omphalitis (spreading erythema, purulence, systemic illness).",
+                        source: "4 - 2nd Half of Infant Lecture.pptx, Slide 8 (Umbilical Granuloma vs Omphalitis)."
+                    },
+                    {
+                        id: 3,
+                        question: "During a routine newborn examination, the FNP notes a sacral dimple. Which of the following findings would classify this dimple as high risk for occult spinal dysraphism, necessitating further imaging?",
+                        options: [
+                            "A. The dimple is located less than 2.5 cm above the anus and the base is visible.",
+                            "B. The dimple is accompanied by a small, midline skin tag and a tuft of hair.",
+                            "C. The dimple is isolated, shallow, and the base is easily visualized.",
+                            "D. The dimple is located in the gluteal cleft without any surrounding discoloration."
+                        ],
+                        correctIndex: 1,
+                        correctKey: "B",
+                        rationale: "Simple sacral dimples are common and usually benign. However, high-risk features for occult spinal dysraphism include a dimple located >2.5 cm above the anus, an inability to see the base of the dimple, or the presence of associated cutaneous abnormalities such as midline masses, skin tags, hemangiomas, or hair tufts.\n\nWhy the other options are less appropriate:\nA. A dimple <2.5 cm from the anus with a visible base is considered low risk and typically requires no further imaging.\nC. An isolated, shallow dimple with a visible base is a normal variant.\nD. Location within the gluteal cleft without other cutaneous markers is characteristic of a benign, simple dimple.",
+                        takeaway: "High-risk sacral dimples require imaging (ultrasound <6 months or MRI >6 months); risk factors include distance >2.5 cm from the anus, hidden base, or associated cutaneous stigmata.",
+                        source: "4 - 2nd Half of Infant Lecture.pptx, Slide 11 (Sacral Dimples)."
+                    },
+                    {
+                        id: 4,
+                        question: "A 3-month-old infant is evaluated for frequent regurgitation after feeds. The mother reports that the infant spits up 3-4 times a day but is gaining weight appropriately along the 50th percentile, seems happy, and has normal stooling patterns. The infant is exclusively breastfed.\n\nWhat is the most appropriate initial management for this patient?",
+                        options: [
+                            "A. Initiate a 4-week trial of an extensively hydrolyzed formula.",
+                            "B. Prescribe a short course of a proton pump inhibitor for acid suppression.",
+                            "C. Provide reassurance and continue current breastfeeding practices.",
+                            "D. Order an upper gastrointestinal series to rule out anatomic abnormalities."
+                        ],
+                        correctIndex: 2,
+                        correctKey: "C",
+                        rationale: "This infant is a 'happy spitter' with uncomplicated gastroesophageal reflux and normal weight gain. Uncomplicated infant reflux requires no laboratory, imaging, or pharmacologic intervention; management consists of reassurance, avoiding overfeeding, and continuing breastfeeding.\n\nWhy the other options are less appropriate:\nA. A trial of an extensively hydrolyzed formula or maternal dairy elimination is indicated if there is suspicion of cow's milk protein allergy (e.g., bloody stools, eczema, severe irritability), which is absent here.\nB. Acid suppression is not a routine first-line treatment for infant reflux and is reserved for established acid-mediated GERD or erosive esophagitis.\nD. An upper GI series is not used to diagnose GERD; it is reserved for evaluating suspected anatomic abnormalities (e.g., malrotation) when alarm features like bilious vomiting are present.",
+                        takeaway: "'Happy spitters' with normal growth require only reassurance and conservative feeding modifications, not medications or imaging.",
+                        source: "4 - 2nd Half of Infant Lecture.pptx, Slide 23 (Gastroesophageal Reflux Disease)."
+                    },
+                    {
+                        id: 5,
+                        question: "A 10-month-old infant presents with a 2-day history of watery diarrhea and vomiting. The infant is alert but irritable. Physical examination reveals sunken eyes, dry mucous membranes, and a capillary refill time of 3 seconds. The infant has had only two wet diapers in the past 12 hours. Weight is down 6% from the last well-child visit.\n\nWhat is the most appropriate initial rehydration strategy for this patient?",
+                        options: [
+                            "A. Administer 20 mL/kg of normal saline as an intravenous bolus.",
+                            "B. Provide 50-100 mL/kg of oral rehydration solution over 2-4 hours.",
+                            "C. Encourage the mother to offer plain water and diluted apple juice frequently.",
+                            "D. Administer 10 mL/kg of oral rehydration solution after each subsequent diarrheal stool."
+                        ],
+                        correctIndex: 1,
+                        correctKey: "B",
+                        rationale: "This infant exhibits signs of moderate dehydration (6% weight loss, irritability, sunken eyes, dry mucous membranes, delayed capillary refill). The standard initial treatment for mild-to-moderate dehydration is oral rehydration therapy (ORT) with a commercial ORS at 50-100 mL/kg over 2-4 hours.\n\nWhy the other options are less appropriate:\nA. Intravenous fluid resuscitation is indicated for severe dehydration or shock (e.g., lethargy, hypotension, absent tears, anuria), which this infant does not currently exhibit.\nC. Plain water, soda, and undiluted juices lack the appropriate sodium-glucose ratio for rehydration and can worsen electrolyte imbalances or diarrhea.\nD. Replacing ongoing losses (10 mL/kg after each stool) is the correct strategy after the initial rehydration deficit has been corrected.",
+                        takeaway: "Mild-to-moderate dehydration is managed with ORT (50-100 mL/kg over 2-4 hours); severe dehydration requires IV fluid resuscitation.",
+                        source: "4 - 2nd Half of Infant Lecture.pptx, Slide (Oral Rehydration Therapy — Infants)."
+                    },
+                    {
+                        id: 6,
+                        question: "A 14-year-old adolescent presents for an annual health maintenance visit. The patient denies any physical complaints but appears withdrawn. According to current USPSTF and AAP GLAD-PC guidelines, what is the most appropriate screening approach for this patient?",
+                        options: [
+                            "A. Screen for depression using a validated tool, as universal screening is recommended for this age group.",
+                            "B. Screen for anxiety only if the patient reports specific somatic symptoms or school avoidance.",
+                            "C. Delay depression screening until the patient is at least 16 years old unless warning signs are present.",
+                            "D. Administer the Pediatric Symptom Checklist, as it is the only validated tool for patients over age 12."
+                        ],
+                        correctIndex: 0,
+                        correctKey: "A",
+                        rationale: "Both the USPSTF and the AAP GLAD-PC guidelines recommend annual universal screening for depression in adolescents aged 12 and older during health maintenance visits. Validated tools such as the PHQ-9-A or Columbia Depression Scale are appropriate.\n\nWhy the other options are less appropriate:\nB. The USPSTF also recommends anxiety screening for youth ages 8-18; screening should not be delayed until somatic symptoms appear.\nC. Universal depression screening begins at age 12, not 16.\nD. The Pediatric Symptom Checklist is a general psychosocial screen, but specific tools like the PHQ-9-A are preferred and validated for adolescent depression screening.",
+                        takeaway: "Universal depression screening is recommended annually for all adolescents aged 12-18.",
+                        source: "Mental Health Fall 2026 s.pdf, Slide (2026 Screening: What FNP Students Should Remember)."
+                    },
+                    {
+                        id: 7,
+                        question: "A 16-year-old is diagnosed with moderate major depressive disorder, and cognitive behavioral therapy is initiated. After four weeks, the patient's symptoms have not significantly improved, and the FNP decides to initiate fluoxetine.\n\nWhat essential counseling must the FNP provide to the patient and their caregivers regarding this medication?",
+                        options: [
+                            "A. The medication carries a risk of serotonin syndrome, which requires immediate emergency department evaluation if muscle rigidity occurs.",
+                            "B. There is a small increased risk of suicidal thinking and behavior, particularly during the initial weeks of treatment.",
+                            "C. The medication may cause permanent growth suppression, requiring annual endocrinology evaluations.",
+                            "D. The patient must avoid all tyramine-rich foods to prevent a life-threatening hypertensive crisis."
+                        ],
+                        correctIndex: 1,
+                        correctKey: "B",
+                        rationale: "SSRIs carry an FDA black box warning regarding the potential emergence of suicidal thinking and behavior (suicidality) in children, adolescents, and young adults. The risk is highest during the initial weeks of treatment or following dose changes, requiring close monitoring.\n\nWhy the other options are less appropriate:\nA. While serotonin syndrome is a rare but serious risk, it is typically associated with polypharmacy (e.g., combining SSRIs with MAOIs), not monotherapy initiation.\nC. SSRIs do not cause permanent growth suppression; however, weight and growth should be monitored as appetite changes can occur.\nD. Dietary tyramine restrictions are required for Monoamine Oxidase Inhibitors (MAOIs), not SSRIs.",
+                        takeaway: "Always counsel families on the SSRI black box warning for suicidality and schedule close follow-up during the first few weeks of treatment.",
+                        source: "Mental Health Fall 2026 s.pdf, Slide (SSRI Black Box Warning)."
+                    },
+                    {
+                        id: 8,
+                        question: "A 4-year-old boy is brought to the clinic for a well-child visit. The mother reports that he frequently falls when running and has difficulty climbing stairs. On examination, the FNP notes enlarged calf muscles. When asked to stand up from a seated position on the floor, the child uses his hands to 'walk' up his thighs.\n\nWhat is the most appropriate initial diagnostic test to order based on these findings?",
+                        options: [
+                            "A. Electromyography and nerve conduction studies",
+                            "B. Serum creatine kinase level",
+                            "C. Magnetic resonance imaging of the lower extremities",
+                            "D. Karyotype analysis to evaluate for chromosomal abnormalities"
+                        ],
+                        correctIndex: 1,
+                        correctKey: "B",
+                        rationale: "The clinical presentation of proximal muscle weakness, calf pseudohypertrophy, and a positive Gowers sign is highly suspicious for Duchenne muscular dystrophy. The most appropriate initial screening test is a serum creatine kinase (CK) level, which will be markedly elevated in dystrophinopathies.\n\nWhy the other options are less appropriate:\nA. EMG and nerve conduction studies are invasive and not the first-line screening test for suspected muscular dystrophy.\nC. MRI is not indicated for the initial diagnosis of neuromuscular weakness.\nD. Karyotype analysis evaluates for chromosomal aneuploidies (e.g., Down syndrome), whereas Duchenne is an X-linked recessive single-gene mutation diagnosed via genetic testing after an elevated CK prompts suspicion.",
+                        takeaway: "Motor delay + weakness + Gowers sign + calf hypertrophy = check CK immediately and refer to pediatric neurology.",
+                        source: "Atypical Development Cases.pptx, Slide 23 (Case 3: 'Late Walker' or Neuromuscular Disease?)."
+                    },
+                    {
+                        id: 9,
+                        question: "A 2-year-old child has a capillary blood lead level of 18 µg/dL obtained during a routine screening. A confirmatory venous blood lead level is drawn and results at 22 µg/dL. According to current CDC and AAP guidelines, what is the most appropriate next step in management?",
+                        options: [
+                            "A. Initiate oral chelation therapy immediately and admit to the hospital.",
+                            "B. Repeat the venous blood lead level in 1 to 3 months and assess for iron deficiency.",
+                            "C. Provide anticipatory guidance, arrange an environmental investigation, and repeat the venous level in 2 weeks to 1 month.",
+                            "D. Reassure the parents that this level is below the toxicity threshold and requires no further action."
+                        ],
+                        correctIndex: 2,
+                        correctKey: "C",
+                        rationale: "For a confirmed venous blood lead level (BLL) of 20-44 µg/dL, management requires a complete history and physical, environmental investigation/hazard reduction, and repeating the venous BLL in 2 weeks to 1 month. Chelation is not routinely recommended in this range.\n\nWhy the other options are less appropriate:\nA. Chelation and hospitalization are reserved for BLL ≥45 µg/dL or symptomatic patients.\nB. A repeat interval of 1-3 months is appropriate for confirmed BLLs of 10-19 µg/dL, not 20-44 µg/dL.\nD. The CDC reference value is 3.5 µg/dL; there is no safe blood lead level, and a level of 22 µg/dL requires active intervention and close monitoring.",
+                        takeaway: "Match the follow-up interval to the confirmed venous BLL: 3.5-9 (3 mos), 10-19 (1-3 mos), 20-44 (2 wks-1 mo), ≥45 (urgent/expert).",
+                        source: "Toddler-Pre-School-School Age s.pptx, Slide (Pediatric Lead Exposure: Management by Confirmed Venous BLL)."
+                    },
+                    {
+                        id: 10,
+                        question: "A 5-year-old child is evaluated for behavioral concerns in kindergarten. The teacher reports that the child cannot stay seated, frequently interrupts others, and struggles to follow multi-step instructions. The parents report similar behaviors at home. The child is diagnosed with attention-deficit/hyperactivity disorder (ADHD).\n\nWhat is the recommended first-line treatment for this patient according to AAP guidelines?",
+                        options: [
+                            "A. Initiation of a long-acting stimulant medication combined with classroom accommodations.",
+                            "B. Referral for evidence-based parent training in behavior management.",
+                            "C. Prescription of a non-stimulant medication such as atomoxetine to avoid stimulant side effects.",
+                            "D. Placement in a specialized educational program with an individualized education plan (IEP)."
+                        ],
+                        correctIndex: 1,
+                        correctKey: "B",
+                        rationale: "For preschool-aged children (ages 4 to <6 years) with ADHD, the AAP recommends evidence-based parent training in behavior management (PTBM) and/or behavioral classroom interventions as the first-line treatment. Medication is only considered if behavioral interventions fail to provide significant improvement and the child continues to have moderate-to-severe impairment.\n\nWhy the other options are less appropriate:\nA. Stimulant medications are first-line for school-aged children (6-11 years), not preschoolers.\nC. Non-stimulants are not first-line for any age group and are reserved for patients who cannot tolerate stimulants or have specific comorbidities.\nD. An IEP is an educational support mechanism, not a primary medical/behavioral treatment for ADHD, and not every child with ADHD qualifies for specialized instruction under IDEA.",
+                        takeaway: "Preschool ADHD (4-5 years) = Behavior therapy first; School-age ADHD (6-11 years) = FDA-approved medication + behavior therapy.",
+                        source: "ADHD.pptx, Slide (Treatment by Age: AAP Framework)."
+                    }
+                ]
+            },
+            set2: {
+                id: 'set2',
+                title: 'Case Studies - Set 2',
+                subtitle: 'Questions 51–75 (Newborns, Gastrointestinal, Lead, Milestones & Psychosocial)',
+                description: 'Focuses on breast milk jaundice, omphalitis vs granuloma, cephalocaudal development, language red flags, lead chelation thresholds, and ADHD guidelines.',
+                questions: [
+                    {
+                        id: 51,
+                        question: "A mother brings her 3-week-old breastfed infant to the clinic for a weight check. The infant is gaining weight appropriately, has normal stool and urine output, and appears well. However, the mother notes the infant’s skin still has a yellowish tint. Total serum bilirubin is elevated, predominantly unconjugated.\n\nWhich of the following best characterizes this infant’s condition?",
+                        options: [
+                            "A. Suboptimal intake hyperbilirubinemia requiring lactation support and supplementation",
+                            "B. Breast milk jaundice, which is typically benign and may persist for several weeks",
+                            "C. Pathologic hemolytic jaundice requiring an immediate direct antiglobulin test",
+                            "D. Biliary atresia requiring urgent pediatric gastroenterology referral and imaging"
+                        ],
+                        correctIndex: 1,
+                        correctKey: "B",
+                        rationale: "Breast milk jaundice typically presents after the first week of life in an infant who is feeding well, gaining weight appropriately, and has normal output. It is characterized by unconjugated hyperbilirubinemia and is generally benign, though persistent jaundice should be evaluated to rule out other causes.\n\nWhy the other options are less appropriate:\nA. Suboptimal intake jaundice occurs in the first week of life and is associated with poor feeding, excessive weight loss, and decreased output.\nC. Hemolytic jaundice typically presents within the first 24 hours of life and is associated with a rapid rise in bilirubin and anemia.\nD. Biliary atresia presents with conjugated (direct) hyperbilirubinemia, acholic stools, and dark urine, which does not match this unconjugated presentation.",
+                        takeaway: "Breast milk jaundice occurs after the first week in a thriving infant; breastfeeding jaundice (suboptimal intake) occurs in the first week in a dehydrated infant.",
+                        source: "4 - 2nd Half of Infant Lecture.pptx, Slide 4 (Hyperbilirubinemia in Infants — Quick Comparison)."
+                    },
+                    {
+                        id: 52,
+                        question: "A 4-week-old infant is evaluated for frequent spitting up. The parents report the infant arches his back and cries during feeds but is gaining weight along the 50th percentile. Which of the following findings would be considered an 'alarm feature' necessitating prompt diagnostic evaluation for conditions other than uncomplicated GERD?",
+                        options: [
+                            "A. Regurgitation of small amounts of formula 20 minutes after feeding",
+                            "B. Forceful, bilious (green) vomiting accompanied by poor weight gain",
+                            "C. Occasional fussiness that resolves after being burped and held upright",
+                            "D. Passing frequent, seedy, yellow stools throughout the day"
+                        ],
+                        correctIndex: 1,
+                        correctKey: "B",
+                        rationale: "Alarm features for infant reflux include bilious or forceful vomiting, GI bleeding, systemic illness, or poor weight gain. Bilious vomiting is a medical emergency requiring immediate evaluation for anatomic abnormalities such as malrotation with volvulus.\n\nWhy the other options are less appropriate:\nA. Spitting up small amounts of milk in a thriving infant is normal physiologic reflux.\nC. Occasional fussiness relieved by burping is common and does not suggest a pathologic condition.\nD. Frequent, seedy, yellow stools are a normal finding in infants and do not indicate an alarm feature for GERD.",
+                        takeaway: "'Happy spitter' = reassure. Bilious vomiting, hematemesis, or poor weight gain = urgent evaluation for anatomic or severe pathology.",
+                        source: "4 - 2nd Half of Infant Lecture.pptx, Slide 23 (Gastroesophageal Reflux Disease)."
+                    },
+                    {
+                        id: 53,
+                        question: "A 10-month-old infant presents with mild-to-moderate dehydration secondary to acute viral gastroenteritis. The FNP prescribes oral rehydration therapy (ORT) using a commercial oral rehydration solution (ORS).\n\nWhat is the most appropriate instruction for administering the ORS to this infant?",
+                        options: [
+                            "A. Administer 50-100 mL/kg of ORS as a single large bolus over 30 minutes",
+                            "B. Provide plain water alternating with undiluted apple juice to encourage intake",
+                            "C. Administer 5 mL (1 tsp) by syringe or spoon every 1–5 minutes, gradually increasing as tolerated",
+                            "D. Dilute the commercial ORS with equal parts water to reduce the osmotic load on the gut"
+                        ],
+                        correctIndex: 2,
+                        correctKey: "C",
+                        rationale: "ORT works best when given in small, frequent amounts. Starting with 5 mL every 1-5 minutes minimizes gastric distention and reduces the likelihood of vomiting, allowing for gradual rehydration.\n\nWhy the other options are less appropriate:\nA. Large, rapid boluses of fluid often trigger the gag reflex and lead to vomiting, worsening dehydration.\nB. Plain water and undiluted juices lack the appropriate sodium-glucose ratio for rehydration and can worsen electrolyte imbalances or osmotic diarrhea.\nD. Commercial ORS should never be diluted unless the product specifically requires mixing, as this alters the precise electrolyte composition necessary for rehydration.",
+                        takeaway: "ORT works best when given SMALL amounts FREQUENTLY — do not give a large bottle all at once.",
+                        source: "4 - 2nd Half of Infant Lecture.pptx, Slide (Oral Rehydration Therapy (ORT) — Infants)."
+                    },
+                    {
+                        id: 54,
+                        question: "A 2-week-old newborn is brought to the clinic because the umbilical cord stump fell off three days ago, but the area looks 'angry.' On examination, the umbilicus is red, swollen, and warm to the touch, with purulent drainage. The surrounding skin of the abdomen is erythematous, and the infant is lethargic and feeding poorly.\n\nWhat is the most appropriate next step in management?",
+                        options: [
+                            "A. Apply silver nitrate to the granulation tissue and reassure the parents",
+                            "B. Obtain a swab for culture and prescribe topical antibiotic ointment",
+                            "C. Refer immediately to the emergency department for hospital evaluation and IV antibiotics",
+                            "D. Instruct the parents to clean the area with rubbing alcohol and fold the diaper down"
+                        ],
+                        correctIndex: 2,
+                        correctKey: "C",
+                        rationale: "This presentation is classic for omphalitis, a bacterial infection of the umbilicus and surrounding tissues. The presence of spreading erythema, purulent drainage, and systemic signs (lethargy, poor feeding) constitutes a medical emergency requiring urgent hospital evaluation and IV broad-spectrum antibiotics.\n\nWhy the other options are less appropriate:\nA. Silver nitrate is the treatment for an umbilical granuloma, which presents as a painless, moist pink nodule without surrounding erythema or systemic illness.\nB. Topical antibiotics are insufficient for omphalitis, which can rapidly progress to necrotizing fasciitis or sepsis.\nD. Cleaning with alcohol is inadequate for an active, spreading bacterial infection with systemic toxicity.",
+                        takeaway: "Distinguish umbilical granuloma (pink nodule, clear drainage, no erythema) from omphalitis (spreading erythema, purulence, systemic illness = emergency).",
+                        source: "4 - 2nd Half of Infant Lecture.pptx, Slide 8 (Umbilical Granuloma vs Omphalitis)."
+                    },
+                    {
+                        id: 55,
+                        question: "During a routine newborn examination, the FNP notes a small sacral dimple. The dimple is located 1 cm above the anus, and the base of the dimple is easily visualized. There are no surrounding skin tags, hair tufts, or discolorations.\n\nWhat is the most appropriate management for this finding?",
+                        options: [
+                            "A. Order an immediate ultrasound of the lumbosacral spine",
+                            "B. Reassure the parents that this is a common, benign finding requiring no further imaging",
+                            "C. Refer to pediatric neurosurgery for evaluation of occult spinal dysraphism",
+                            "D. Schedule an MRI of the spine to be performed when the infant is 6 months old"
+                        ],
+                        correctIndex: 1,
+                        correctKey: "B",
+                        rationale: "Simple sacral dimples are common and usually benign. Low-risk features include a dimple located <2.5 cm above the anus, a visible base, and the absence of associated cutaneous abnormalities. No further imaging or intervention is required.\n\nWhy the other options are less appropriate:\nA. Ultrasound is indicated for high-risk dimples (e.g., >2.5 cm from anus, hidden base, or associated cutaneous stigmata).\nC. Neurosurgery referral is premature and unnecessary for a simple, low-risk dimple.\nD. MRI is not indicated for low-risk dimples; it is reserved for high-risk cases or when ultrasound (if <6 months) is inconclusive.",
+                        takeaway: "Low-risk sacral dimples (<2.5 cm from anus, visible base, no skin stigmata) require no imaging. High-risk features warrant ultrasound (<6 months) or MRI.",
+                        source: "4 - 2nd Half of Infant Lecture.pptx, Slide 11 (Sacral Dimples- Risk for Occult Spinal Dysraphism)."
+                    }
+                ]
+            },
+            set3: {
+                id: 'set3',
+                title: 'Case Studies - Set 3',
+                subtitle: 'Comprehensive Practice Set (Growth, Screening & Clinical Scenarios)',
+                description: 'Comprehensive evaluation set testing developmental theories (Piaget, Erikson), cholesterol screening rules, Autism screening (M-CHAT), and stimulant management.',
+                questions: [
+                    {
+                        id: 101,
+                        question: "A 7-year-old child presents for a well-child visit. The child’s body mass index (BMI) is at the 92nd percentile. The family history is notable for a paternal grandfather who suffered a myocardial infarction at age 68. The parents ask if the child should have a lipid panel drawn today.\n\nWhat is the most appropriate response based on current pediatric cholesterol screening guidelines?",
+                        options: [
+                            "A. Universal screening is recommended today because the child is between the ages of 6 and 8.",
+                            "B. Screening is indicated today because the child’s BMI is at or above the 85th percentile.",
+                            "C. Screening should be deferred until the child is between 9 and 11 years old, as there are no current risk factors.",
+                            "D. Screening is only recommended if the child’s BMI exceeds the 97th percentile or if diabetes is present."
+                        ],
+                        correctIndex: 1,
+                        correctKey: "B",
+                        rationale: "While universal cholesterol screening is recommended between ages 9-11, targeted screening is indicated before age 9 if the child has risk factors. A BMI ≥85th percentile (overweight) is a recognized cardiovascular risk factor that warrants early lipid screening, regardless of the family history provided.\n\nWhy the other options are less appropriate:\nA. Universal screening does not begin until age 9.\nC. The child has a clear risk factor (BMI ≥85th percentile), so screening should not be deferred.\nD. A BMI ≥85th percentile is sufficient to warrant screening; waiting for the 97th percentile or a diabetes diagnosis misses the window for early intervention in overweight children.",
+                        takeaway: "Screen universally at 9-11 years; screen earlier if BMI ≥85th percentile or there is a family history of premature CVD.",
+                        source: "Toddler-Pre-School-School Age s.pptx, Slide 28 (Cholesterol Screening)."
+                    },
+                    {
+                        id: 102,
+                        question: "A 9-year-old girl with ADHD has been taking immediate-release methylphenidate for three months. Her parents report improved focus at school but note she has difficulty falling asleep and has lost her appetite at lunchtime.\n\nWhat is the most appropriate next step in managing this patient’s treatment?",
+                        options: [
+                            "A. Discontinue the methylphenidate immediately and switch to a non-stimulant medication",
+                            "B. Reassure the parents that these are transient side effects that will resolve without intervention",
+                            "C. Adjust the timing of the medication dose and monitor her growth trajectory and sleep hygiene",
+                            "D. Order a baseline electrocardiogram (EKG) to evaluate for stimulant-induced cardiac arrhythmias"
+                        ],
+                        correctIndex: 2,
+                        correctKey: "C",
+                        rationale: "Appetite suppression and insomnia are common adverse effects of stimulant medications. Management includes adjusting the timing of the dose (e.g., giving it earlier in the day), encouraging a large breakfast, and monitoring height/weight trajectories and blood pressure/heart rate.\n\nWhy the other options are less appropriate:\nA. Discontinuation is premature; side effects can often be managed with dose timing adjustments or formulation changes before abandoning a highly effective medication class.\nB. While some side effects improve, appetite suppression and sleep disruption require active monitoring and management to prevent growth faltering and daytime fatigue.\nD. A baseline EKG is only recommended for individuals with a positive cardiac history or a family history of unexplained sudden death/MI before age 50, not as a routine response to common side effects.",
+                        takeaway: "Manage common stimulant side effects (appetite, sleep) with dose timing and hygiene adjustments; monitor growth and cardiovascular parameters routinely.",
+                        source: "ADHD.pptx, Slide (Stimulant Monitoring & Adverse Effects)."
+                    },
+                    {
+                        id: 103,
+                        question: "An 8-year-old boy is evaluated for poor academic performance and inattention. His teacher reports he frequently stares off into space and fails to complete assignments. The parents note he snores loudly, breathes through his mouth, and is restless at night.\n\nWhat is the most appropriate next step in the evaluation of this patient?",
+                        options: [
+                            "A. Administer the Vanderbilt ADHD Diagnostic Rating Scale to confirm an ADHD diagnosis",
+                            "B. Refer for a sleep study to evaluate for obstructive sleep apnea",
+                            "C. Initiate a trial of a long-acting stimulant medication to improve daytime alertness",
+                            "D. Order an electroencephalogram (EEG) to rule out absence seizures"
+                        ],
+                        correctIndex: 1,
+                        correctKey: "B",
+                        rationale: "Insufficient sleep and sleep-disordered breathing (such as obstructive sleep apnea) are common mimics of ADHD. Symptoms like inattention, hyperactivity, and daytime sleepiness can be entirely secondary to poor sleep quality. Evaluating and treating the underlying sleep disorder is the priority before diagnosing ADHD.\n\nWhy the other options are less appropriate:\nA. While rating scales are useful, diagnosing ADHD without first ruling out a clear medical mimic (like sleep apnea suggested by snoring and mouth breathing) is inappropriate.\nC. Stimulants are contraindicated as a first-line treatment for inattention secondary to an untreated sleep disorder.\nD. While absence seizures can cause staring spells, the prominent history of snoring and restless sleep strongly points toward a sleep-disordered breathing etiology as the primary differential.",
+                        takeaway: "Always rule out mimics like sleep apnea, vision/hearing impairment, and anxiety before diagnosing ADHD, especially when specific clues (e.g., snoring) are present.",
+                        source: "ADHD.pptx, Slide (ADHD or Something Else? Common Mimics)."
+                    },
+                    {
+                        id: 104,
+                        question: "A mother brings her 24-month-old child to the clinic, expressing concern that the child used to say 'mama' and 'dada' and wave bye-bye at 12 months, but has since stopped using words and no longer makes eye contact. How should the FNP interpret this developmental history?",
+                        options: [
+                            "A. This represents a normal developmental plateau that frequently occurs between 18 and 24 months of age",
+                            "B. This is a major red flag indicating developmental regression that requires urgent comprehensive evaluation",
+                            "C. This is likely secondary to a recent mild viral illness and will resolve with time and reassurance",
+                            "D. This indicates a primary expressive language delay that can be managed with routine outpatient speech therapy"
+                        ],
+                        correctIndex: 1,
+                        correctKey: "B",
+                        rationale: "The loss of previously acquired milestones (language or social skills) at any age is a significant red flag. It warrants urgent and comprehensive evaluation for neurologic, metabolic, or severe neurodevelopmental conditions, including Autism Spectrum Disorder or childhood disintegrative disorder.\n\nWhy the other options are less appropriate:\nA. Developmental plateaus may occur, but the actual loss of previously established skills (regression) is never considered normal.\nC. While severe illness can temporarily delay progress, true regression of language and social skills is not a typical post-viral sequela and requires immediate investigation.\nD. A primary expressive language delay involves a failure to acquire new words, not the loss of previously acquired words and social engagement.",
+                        takeaway: "Any loss of previously acquired developmental milestones (regression) is an absolute red flag requiring urgent, comprehensive medical and neurodevelopmental evaluation.",
+                        source: "2 Growth and development Part 2.pdf, Page 31 (Key Points: Anytime a milestone is met and then lost is a reason for further evaluation)."
+                    },
+                    {
+                        id: 105,
+                        question: "A 10-year-old boy with ADHD and a comorbid tic disorder has not responded well to stimulant therapy due to exacerbation of his tics and severe rebound irritability. The FNP decides to switch to a non-stimulant medication. Which of the following medications is an alpha-2 adrenergic agonist that may be particularly useful for this patient's symptom profile?",
+                        options: [
+                            "A. Atomoxetine",
+                            "B. Viloxazine",
+                            "C. Guanfacine extended-release",
+                            "D. Bupropion"
+                        ],
+                        correctIndex: 2,
+                        correctKey: "C",
+                        rationale: "Guanfacine ER (Intuniv) and clonidine (Kapvay) are alpha-2 adrenergic agonists. They are non-stimulant options for ADHD that can be particularly beneficial when hyperactivity, impulsivity, sleep difficulties, or comorbid tic disorders are present, as they do not exacerbate tics like stimulants sometimes can.\n\nWhy the other options are less appropriate:\nA. Atomoxetine is a selective norepinephrine reuptake inhibitor (SNRI), not an alpha-2 agonist.\nB. Viloxazine is also a selective norepinephrine reuptake inhibitor, not an alpha-2 agonist.\nD. Bupropion is an atypical antidepressant (NDRI) sometimes used off-label for ADHD, but it is not an alpha-2 agonist and lowers the seizure threshold.",
+                        takeaway: "Alpha-2 agonists (guanfacine, clonidine) are useful non-stimulants for ADHD, especially when tics, severe hyperactivity, or insomnia are comorbid.",
+                        source: "ADHD.pptx, Slide (Nonstimulants: When and Why?)."
+                    }
+                ]
+            }
+        };
+
+        // Application State Management
+        let currentSetKey = 'set1';
+        let currentQuestionIndex = 0;
+        let selectedOptionIndex = null;
+        let userAnswers = {}; // Format: { setKey: { questionIndex: { selected: number, submitted: boolean } } }
+
+        // Local Storage Persistence Keys
+        const STORAGE_KEY = 'fnp_exam_progress_v1';
+
+        // Load progress on initial launch
+        function initApp() {
+            loadSavedProgress();
+            renderDashboardCards();
+            showDashboard();
+        }
+
+        // Save progress to LocalStorage
+        function saveProgress() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(userAnswers));
+            } catch (e) {
+                console.error("Could not save progress to local storage", e);
+            }
+        }
+
+        // Load progress from LocalStorage
+        function loadSavedProgress() {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    userAnswers = JSON.parse(saved);
+                }
+            } catch (e) {
+                console.error("Could not load progress", e);
+                userAnswers = {};
+            }
+
+            // Ensure state structure exists
+            Object.keys(EXAM_DATA).forEach(setKey => {
+                if (!userAnswers[setKey]) {
+                    userAnswers[setKey] = {};
+                }
+            });
+        }
+
+        // Reset progress confirmation
+        function confirmResetProgress() {
+            if (confirm("Are you sure you want to reset all your exam progress and scores? This cannot be undone.")) {
+                userAnswers = {};
+                Object.keys(EXAM_DATA).forEach(setKey => {
+                    userAnswers[setKey] = {};
+                });
+                saveProgress();
+                renderDashboardCards();
+                if (!document.getElementById('quiz-view').classList.contains('hidden')) {
+                    loadQuestion(currentQuestionIndex);
+                }
+            }
+        }
+
+        // Calculate Stats for a Set
+        function getSetStats(setKey) {
+            const set = EXAM_DATA[setKey];
+            const setAnswers = userAnswers[setKey] || {};
+            const total = set.questions.length;
+            let answered = 0;
+            let correct = 0;
+
+            set.questions.forEach((q, idx) => {
+                const ans = setAnswers[idx];
+                if (ans && ans.submitted) {
+                    answered++;
+                    if (ans.selected === q.correctIndex) {
+                        correct++;
+                    }
+                }
+            });
+
+            const accuracy = answered > 0 ? Math.round((correct / answered) * 100) : 0;
+            return { total, answered, correct, accuracy };
+        }
+
+        // Render Dashboard Cards
+        function renderDashboardCards() {
+            const container = document.getElementById('set-cards-container');
+            container.innerHTML = '';
+
+            let totalQuestions = 0;
+            let totalAnswered = 0;
+            let totalCorrect = 0;
+
+            Object.keys(EXAM_DATA).forEach(setKey => {
+                const set = EXAM_DATA[setKey];
+                const stats = getSetStats(setKey);
+
+                totalQuestions += stats.total;
+                totalAnswered += stats.answered;
+                totalCorrect += stats.correct;
+
+                const percentComplete = Math.round((stats.answered / stats.total) * 100);
+
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col justify-between hover:shadow-md transition cursor-pointer group';
+                card.onclick = () => startQuestionSet(setKey);
+
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-md">
+                                ${stats.total} Questions
+                            </span>
+                            <span class="text-xs font-semibold text-slate-400">
+                                ${percentComplete}% Complete
+                            </span>
+                        </div>
+                        <h4 class="text-xl font-bold text-slate-800 group-hover:text-indigo-600 transition mb-2">
+                            ${set.title}
+                        </h4>
+                        <p class="text-xs font-medium text-indigo-700/80 mb-3">${set.subtitle}</p>
+                        <p class="text-xs text-slate-600 leading-relaxed mb-6">
+                            ${set.description}
+                        </p>
+                    </div>
+
+                    <div>
+                        <!-- Progress Bar -->
+                        <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden mb-4">
+                            <div class="bg-indigo-600 h-full transition-all duration-300" style="width: ${percentComplete}%"></div>
+                        </div>
+
+                        <div class="flex items-center justify-between pt-2 border-t border-slate-100">
+                            <div class="text-xs text-slate-500">
+                                <span class="font-bold text-slate-700">${stats.answered}</span> / ${stats.total} Answered
+                                ${stats.answered > 0 ? `<span class="ml-2 text-emerald-600 font-semibold">(${stats.accuracy}% Correct)</span>` : ''}
+                            </div>
+                            <span class="text-sm font-semibold text-indigo-600 flex items-center space-x-1 group-hover:translate-x-1 transition-transform">
+                                <span>Start</span>
+                                <i class="fa-solid fa-arrow-right text-xs"></i>
+                            </span>
+                        </div>
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+
+            // Update Overall Stats
+            document.getElementById('overall-completed').innerText = `${totalAnswered} / ${totalQuestions} Answered`;
+            const overallAcc = totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0;
+            document.getElementById('overall-accuracy').innerText = `Overall Accuracy: ${totalAnswered > 0 ? overallAcc + '%' : '--%'}`;
+        }
+
+        // Show Dashboard View
+        function showDashboard() {
+            document.getElementById('dashboard-view').classList.remove('hidden');
+            document.getElementById('quiz-view').classList.add('hidden');
+            renderDashboardCards();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Start Question Set
+        function startQuestionSet(setKey) {
+            currentSetKey = setKey;
+            
+            // Find first unsubmitted question or default to 0
+            const setAnswers = userAnswers[currentSetKey] || {};
+            const questions = EXAM_DATA[currentSetKey].questions;
+            
+            let firstUnanswered = 0;
+            for (let i = 0; i < questions.length; i++) {
+                if (!setAnswers[i] || !setAnswers[i].submitted) {
+                    firstUnanswered = i;
+                    break;
+                }
+            }
+
+            currentQuestionIndex = firstUnanswered;
+            document.getElementById('quiz-set-title').innerText = EXAM_DATA[currentSetKey].title;
+            
+            document.getElementById('dashboard-view').classList.add('hidden');
+            document.getElementById('quiz-view').classList.remove('hidden');
+
+            renderQuestionGrid();
+            loadQuestion(currentQuestionIndex);
+        }
+
+        // Render Question Navigation Grid (Left Sidebar)
+        function renderQuestionGrid() {
+            const container = document.getElementById('question-grid');
+            container.innerHTML = '';
+
+            const questions = EXAM_DATA[currentSetKey].questions;
+            const setAnswers = userAnswers[currentSetKey] || {};
+            const stats = getSetStats(currentSetKey);
+
+            document.getElementById('grid-score').innerText = `Score: ${stats.correct}/${stats.answered}`;
+
+            questions.forEach((q, idx) => {
+                const btn = document.createElement('button');
+                const ans = setAnswers[idx];
+
+                let stateClasses = "bg-slate-100 text-slate-700 hover:bg-slate-200 border-slate-200";
+
+                if (ans && ans.submitted) {
+                    if (ans.selected === q.correctIndex) {
+                        stateClasses = "bg-emerald-100 text-emerald-800 border-emerald-300 font-bold";
+                    } else {
+                        stateClasses = "bg-rose-100 text-rose-800 border-rose-300 font-bold";
+                    }
+                } else if (ans && ans.selected !== null) {
+                    stateClasses = "bg-amber-100 text-amber-800 border-amber-300 font-medium";
+                }
+
+                if (idx === currentQuestionIndex) {
+                    stateClasses += " ring-2 ring-indigo-600 ring-offset-1";
+                }
+
+                btn.className = `w-full h-9 rounded-lg border text-xs flex items-center justify-center transition ${stateClasses}`;
+                btn.innerText = idx + 1;
+                btn.onclick = () => loadQuestion(idx);
+
+                container.appendChild(btn);
+            });
+        }
+
+        // Load specific question into view
+        function loadQuestion(index) {
+            currentQuestionIndex = index;
+            const set = EXAM_DATA[currentSetKey];
+            const q = set.questions[index];
+            const setAnswers = userAnswers[currentSetKey] || {};
+            const savedAns = setAnswers[index];
+
+            // Update Headers & Progress
+            document.getElementById('quiz-progress-text').innerText = `Question ${index + 1} of ${set.questions.length}`;
+            document.getElementById('q-badge').innerText = `Question ${index + 1} of ${set.questions.length}`;
+
+            // Update Navigation Button States
+            document.getElementById('prev-btn').disabled = index === 0;
+            document.getElementById('next-btn').disabled = index === set.questions.length - 1;
+
+            // Render Question Text
+            document.getElementById('q-text').innerText = q.question;
+
+            // Render Options
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+
+            const isSubmitted = savedAns && savedAns.submitted;
+            selectedOptionIndex = savedAns ? savedAns.selected : null;
+
+            // Update Question Status Badge
+            const statusElem = document.getElementById('q-status');
+            if (isSubmitted) {
+                const isCorrect = selectedOptionIndex === q.correctIndex;
+                statusElem.innerText = isCorrect ? "Correct" : "Incorrect";
+                statusElem.className = isCorrect ? "text-xs font-bold text-emerald-600" : "text-xs font-bold text-rose-600";
+            } else if (selectedOptionIndex !== null) {
+                statusElem.innerText = "Option Selected (Unsubmitted)";
+                statusElem.className = "text-xs font-bold text-amber-600";
+            } else {
+                statusElem.innerText = "Not Answered";
+                statusElem.className = "text-xs font-semibold text-slate-400";
+            }
+
+            q.options.forEach((optText, optIdx) => {
+                const optBtn = document.createElement('button');
+                optBtn.className = getOptionStyleClasses(optIdx, q.correctIndex, selectedOptionIndex, isSubmitted);
+                
+                optBtn.innerHTML = `
+                    <div class="flex items-start space-x-3 text-left w-full">
+                        <div class="mt-0.5 flex-shrink-0">
+                            ${getOptionIconHTML(optIdx, q.correctIndex, selectedOptionIndex, isSubmitted)}
+                        </div>
+                        <span class="text-sm sm:text-base leading-snug">${optText}</span>
+                    </div>
+                `;
+
+                if (!isSubmitted) {
+                    optBtn.onclick = () => selectOption(optIdx);
+                }
+
+                optionsContainer.appendChild(optBtn);
+            });
+
+            // Handle Action Bar & Submit Button State
+            const submitBtn = document.getElementById('submit-btn');
+            const clearBtn = document.getElementById('clear-btn');
+
+            if (isSubmitted) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = `<i class="fa-solid fa-check text-xs"></i> <span>Submitted</span>`;
+                submitBtn.className = "px-6 py-2.5 bg-slate-200 text-slate-500 text-sm font-semibold rounded-xl cursor-not-allowed flex items-center space-x-2";
+                clearBtn.classList.remove('hidden');
+            } else {
+                submitBtn.disabled = selectedOptionIndex === null;
+                submitBtn.innerHTML = `<i class="fa-solid fa-paper-plane text-xs"></i> <span>Submit Answer</span>`;
+                submitBtn.className = selectedOptionIndex === null 
+                    ? "px-6 py-2.5 bg-slate-300 text-slate-500 text-sm font-semibold rounded-xl cursor-not-allowed flex items-center space-x-2"
+                    : "px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl shadow-sm transition flex items-center space-x-2";
+                clearBtn.classList.add('hidden');
+            }
+
+            // Handle Rationale Display
+            const rationaleBox = document.getElementById('rationale-box');
+            if (isSubmitted) {
+                rationaleBox.classList.remove('hidden');
+                
+                const isCorrect = selectedOptionIndex === q.correctIndex;
+                const banner = document.getElementById('result-banner');
+                const icon = document.getElementById('result-icon');
+                const title = document.getElementById('result-title');
+                const correctAnsText = document.getElementById('result-correct-answer');
+
+                if (isCorrect) {
+                    banner.className = "p-4 rounded-xl flex items-start space-x-3 bg-emerald-50 border border-emerald-200 text-emerald-900";
+                    icon.className = "fa-solid fa-circle-check text-emerald-600 text-xl mt-0.5";
+                    title.innerText = "Correct!";
+                    correctAnsText.innerText = `You correctly selected choice ${q.correctKey}.`;
+                } else {
+                    banner.className = "p-4 rounded-xl flex items-start space-x-3 bg-rose-50 border border-rose-200 text-rose-900";
+                    icon.className = "fa-solid fa-circle-xmark text-rose-600 text-xl mt-0.5";
+                    title.innerText = "Incorrect";
+                    correctAnsText.innerText = `Correct Answer: Option ${q.correctKey}`;
+                }
+
+                document.getElementById('rationale-text').innerText = q.rationale;
+                document.getElementById('takeaway-text').innerText = q.takeaway;
+                document.getElementById('source-text').innerText = q.source;
+            } else {
+                rationaleBox.classList.add('hidden');
+            }
+
+            renderQuestionGrid();
+        }
+
+        // Option styling logic helper
+        function getOptionStyleClasses(optIdx, correctIdx, selectedIdx, isSubmitted) {
+            const base = "w-full p-4 rounded-xl border transition flex items-center justify-between ";
+
+            if (isSubmitted) {
+                if (optIdx === correctIdx) {
+                    return base + "bg-emerald-50 border-emerald-500 text-emerald-900 font-medium ring-1 ring-emerald-500";
+                }
+                if (optIdx === selectedIdx && selectedIdx !== correctIdx) {
+                    return base + "bg-rose-50 border-rose-400 text-rose-900 font-medium";
+                }
+                return base + "bg-slate-50 border-slate-200 text-slate-400 opacity-70";
+            } else {
+                if (optIdx === selectedIdx) {
+                    return base + "bg-indigo-50 border-indigo-600 text-indigo-900 font-medium ring-2 ring-indigo-600/30";
+                }
+                return base + "bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-800";
+            }
+        }
+
+        // Option icon rendering helper
+        function getOptionIconHTML(optIdx, correctIdx, selectedIdx, isSubmitted) {
+            if (isSubmitted) {
+                if (optIdx === correctIdx) {
+                    return `<i class="fa-solid fa-circle-check text-emerald-600 text-lg"></i>`;
+                }
+                if (optIdx === selectedIdx && selectedIdx !== correctIdx) {
+                    return `<i class="fa-solid fa-circle-xmark text-rose-500 text-lg"></i>`;
+                }
+                return `<i class="fa-regular fa-circle text-slate-300 text-lg"></i>`;
+            } else {
+                if (optIdx === selectedIdx) {
+                    return `<i class="fa-solid fa-circle-dot text-indigo-600 text-lg"></i>`;
+                }
+                return `<i class="fa-regular fa-circle text-slate-400 text-lg"></i>`;
+            }
+        }
+
+        // Select option before submitting
+        function selectOption(optIdx) {
+            selectedOptionIndex = optIdx;
+            
+            if (!userAnswers[currentSetKey]) {
+                userAnswers[currentSetKey] = {};
+            }
+            
+            userAnswers[currentSetKey][currentQuestionIndex] = {
+                selected: optIdx,
+                submitted: false
+            };
+
+            saveProgress();
+            loadQuestion(currentQuestionIndex);
+        }
+
+        // Submit answer for evaluation
+        function submitAnswer() {
+            if (selectedOptionIndex === null) return;
+
+            if (!userAnswers[currentSetKey]) {
+                userAnswers[currentSetKey] = {};
+            }
+
+            userAnswers[currentSetKey][currentQuestionIndex] = {
+                selected: selectedOptionIndex,
+                submitted: true
+            };
+
+            saveProgress();
+            loadQuestion(currentQuestionIndex);
+
+            // Smooth scroll to rationale
+            setTimeout(() => {
+                document.getElementById('rationale-box').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        }
+
+        // Reset current question choice
+        function resetCurrentQuestion() {
+            if (userAnswers[currentSetKey] && userAnswers[currentSetKey][currentQuestionIndex]) {
+                delete userAnswers[currentSetKey][currentQuestionIndex];
+                saveProgress();
+                selectedOptionIndex = null;
+                loadQuestion(currentQuestionIndex);
+            }
+        }
+
+        // Forward / Back Navigation between questions
+        function navQuestion(delta) {
+            const set = EXAM_DATA[currentSetKey];
+            const newIdx = currentQuestionIndex + delta;
+
+            if (newIdx >= 0 && newIdx < set.questions.length) {
+                loadQuestion(newIdx);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        // Keybindings for rapid practice (Arrow keys, 1-4 option select, Enter to submit)
+        document.addEventListener('keydown', (e) => {
+            if (document.getElementById('quiz-view').classList.contains('hidden')) return;
+
+            if (e.key === 'ArrowRight') {
+                navQuestion(1);
+            } else if (e.key === 'ArrowLeft') {
+                navQuestion(-1);
+            } else if (['1', '2', '3', '4'].includes(e.key)) {
+                const optIdx = parseInt(e.key) - 1;
+                const setAnswers = userAnswers[currentSetKey] || {};
+                const isSubmitted = setAnswers[currentQuestionIndex] && setAnswers[currentQuestionIndex].submitted;
+                if (!isSubmitted) {
+                    selectOption(optIdx);
+                }
+            } else if (e.key === 'Enter') {
+                const setAnswers = userAnswers[currentSetKey] || {};
+                const isSubmitted = setAnswers[currentQuestionIndex] && setAnswers[currentQuestionIndex].submitted;
+                if (!isSubmitted && selectedOptionIndex !== null) {
+                    submitAnswer();
+                }
+            }
+        });
+
+        // Initialize App on DOM load
+        window.onload = initApp;
+    </script>
+</body>
+</html>
