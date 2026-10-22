@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pediatric Cardiac Atlas - Active Hemodynamics</title>
+    <style>
+        :root {
+            --bg-color: #0b0e14;
+            --panel-bg: #131722;
+            --text-main: #a9b1d6;
+            --text-muted: #565f89;
+            --accent-blue: #7aa2f7;
+            --accent-red: #f7768e;
+            --border-color: #292e42;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #canvas-container {
+            flex: 60%;
+            position: relative;
+        }
+
+        #tooltip {
+            position: absolute;
+            background: rgba(19, 23, 34, 0.95);
+            border: 1px solid var(--accent-blue);
+            padding: 10px;
+            border-radius: 6px;
+            pointer-events: none;
+            display: none;
+            font-size: 0.85rem;
+            color: #fff;
+            z-index: 1000;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            max-width: 200px;
+        }
+
+        #tooltip strong { color: var(--accent-red); display: block; margin-bottom: 5px; }
+
+        #info-panel {
+            flex: 40%;
+            background-color: var(--panel-bg);
+            border-left: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        header h1 {
+            margin: 0 0 15px 0;
+            font-size: 1.4rem;
+            color: #fff;
+            font-weight: 400;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--bg-color);
+            color: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            outline: none;
+        }
+
+        select:focus { border-color: var(--accent-blue); }
+
+        #study-guide-content {
+            padding: 20px;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        h3 { color: var(--accent-blue); margin-top: 0; font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; }
+        p, ul { font-size: 0.95rem; line-height: 1.6; color: var(--text-main); }
+        li { margin-bottom: 8px; }
+        .alert { color: var(--accent-red); font-weight: bold; }
+        
+        .instructions {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            pointer-events: none;
+            background: rgba(0,0,0,0.5);
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+
+    <div id="canvas-container">
+        <div id="tooltip"></div>
+        <div class="instructions">LEFT CLICK + DRAG to rotate | SCROLL to zoom | HOVER for anatomy</div>
+    </div>
+
+    <div id="info-panel">
+        <header>
+            <h1>Pediatric Cardiac Atlas</h1>
+            <select id="pathology-select">
+                <option value="normal">Normal Heart Physiology</option>
+                <option value="asd">Atrial Septal Defect (ASD)</option>
+                <option value="vsd">Ventricular Septal Defect (VSD)</option>
+                <option value="pda">Patent Ductus Arteriosus (PDA)</option>
+                <option value="tof">Tetralogy of Fallot (TOF)</option>
+                <option value="coa">Coarctation of the Aorta (COA)</option>
+            </select>
+        </header>
+        <div id="study-guide-content"></div>
+    </div>
+
+    <script>
+        // --- STUDY GUIDE DATA ---
+        const studyData = {
+            normal: { html: `<h3>Hemodynamics</h3><p>Blood flows from higher pressure to lower pressure, taking the path of least resistance. After birth, when lungs expand, pulmonary vascular resistance drops.</p><h3>Pressures</h3><ul><li><strong>Left Side:</strong> Higher pressure (Systemic).</li><li><strong>Right Side:</strong> Lower pressure (Pulmonary).</li></ul>` },
+            asd: { html: `<h3>Pathophysiology</h3><p>An opening in the atrial septum. Because Left Atrial pressure > Right Atrial pressure, blood shunts <strong>Left-to-Right</strong>.</p><h3>Symptoms</h3><ul><li>Acyanotic.</li><li>May be asymptomatic. CHF is unusual.</li><li>Right atrial/ventricular enlargement.</li></ul><h3>Treatment</h3><p>Cath lab closure (clamshell occluder) or surgical patch.</p>` },
+            vsd: { html: `<h3>Pathophysiology</h3><p>Opening in the ventricular septum. <strong>Most common CHD.</strong> High-pressure LV shunts oxygenated blood to the lower-pressure RV (Left-to-Right).</p><h3>Symptoms</h3><ul><li>Acyanotic. High risk for <span class="alert">Congestive Heart Failure (CHF)</span>.</li><li>Loud murmur.</li><li><strong>Eisenmenger Syndrome:</strong> If untreated, pulmonary hypertension develops, reversing shunt to R->L (cyanosis).</li></ul><h3>Treatment</h3><p>20-60% close in year 1. Surgical patch for larger defects.</p>` },
+            pda: { html: `<h3>Pathophysiology</h3><p>Failure of fetal ductus arteriosus to close. Blood shunts from high-pressure Aorta back into the Pulmonary Artery (Left-to-Right).</p><h3>Symptoms</h3><ul><li>Acyanotic.</li><li>Classic <span class="alert">Continuous Machinery Murmur</span>.</li><li>Widened pulse pressure.</li></ul><h3>Treatment</h3><p>Medical: <strong>Indomethacin</strong> to promote closure. Surgical: Coil embolization or ligation.</p>` },
+            tof: { html: `<h3>Pathophysiology</h3><p>Four defects: VSD, Pulmonic Stenosis, Overriding Aorta, RV Hypertrophy. The stenosis creates extreme resistance, forcing deoxygenated blood across the VSD and out the Aorta (<strong>Right-to-Left Shunt</strong>).</p><h3>Symptoms</h3><ul><li><span class="alert">Cyanotic at birth</span>.</li><li><strong>TET Spells (Hypercyanotic):</strong> Acute hypoxia. Treat by placing infant in <strong>knee-chest position</strong>.</li></ul><h3>Treatment</h3><p>Palliative BT Shunt. Complete surgical repair usually by 1 year.</p>` },
+            coa: { html: `<h3>Pathophysiology</h3><p>Localized narrowing (stricture) of the descending aorta, increasing afterload on the left ventricle.</p><h3>Symptoms</h3><ul><li>Obstructive defect.</li><li><span class="alert">High BP & bounding pulses</span> in upper extremities.</li><li><span class="alert">Low BP & weak/absent pulses</span> in lower extremities.</li></ul><h3>Treatment</h3><p>Balloon angioplasty/stent or surgical resection and anastomosis.</p>` }
+        };
+
+        // --- THREE.JS SCENE SETUP ---
+        const container = document.getElementById('canvas-container');
+        const tooltip = document.getElementById('tooltip');
+        
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+        camera.position.set(0, 2, 18);
+
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        container.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.enablePan = false;
+        controls.autoRotate = false;
+
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        dirLight.position.set(5, 10, 7);
+        scene.add(dirLight);
+
+        // --- X-RAY MATERIALS ---
+        const matLeftSurface = new THREE.MeshPhongMaterial({ color: 0x220000, transparent: true, opacity: 0.3, shininess: 90 });
+        const matRightSurface = new THREE.MeshPhongMaterial({ color: 0x000022, transparent: true, opacity: 0.3, shininess: 90 });
+        const matLeftEdge = new THREE.LineBasicMaterial({ color: 0xff3366, linewidth: 2 });
+        const matRightEdge = new THREE.LineBasicMaterial({ color: 0x33ccff, linewidth: 2 });
+        const matDefect = new THREE.MeshBasicMaterial({ color: 0xffff00, transparent: true, opacity: 0.4 });
+
+        const heartGroup = new THREE.Group();
+        const interactableObjects = [];
+
+        function buildAnatomy(geometry, surfaceMat, edgeMat, position, rotation, name, desc) {
+            const mesh = new THREE.Mesh(geometry, surfaceMat);
+            const edges = new THREE.EdgesGeometry(geometry);
+            const line = new THREE.LineSegments(edges, edgeMat);
+            mesh.add(line);
+            if (position) mesh.position.set(position.x, position.y, position.z);
+            if (rotation) mesh.rotation.set(rotation.x, rotation.y, rotation.z);
+            mesh.userData = { name, desc };
+            interactableObjects.push(mesh);
+            heartGroup.add(mesh);
+            return mesh;
+        }
+
+        // --- BUILD SCHEMATIC ANATOMY ---
+        const lvGeo = new THREE.SphereGeometry(3, 32, 32);
+        lvGeo.applyMatrix4(new THREE.Matrix4().makeScale(1, 1.4, 1));
+        buildAnatomy(lvGeo, matLeftSurface, matLeftEdge, {x: -2, y: -2, z: 0}, {x: 0, y: 0, z: -0.3}, "Left Ventricle (LV)", "Pumps oxygenated blood to the body.");
+
+        const rvGeo = new THREE.SphereGeometry(2.8, 32, 32);
+        rvGeo.applyMatrix4(new THREE.Matrix4().makeScale(0.8, 1.2, 0.8));
+        buildAnatomy(rvGeo, matRightSurface, matRightEdge, {x: 2.2, y: -1.5, z: 0.5}, null, "Right Ventricle (RV)", "Pumps deoxygenated blood to the lungs.");
+
+        buildAnatomy(new THREE.SphereGeometry(1.8, 32, 32), matLeftSurface, matLeftEdge, {x: -2.5, y: 3, z: -1}, null, "Left Atrium (LA)", "Receives oxygenated blood.");
+        buildAnatomy(new THREE.SphereGeometry(2, 32, 32), matRightSurface, matRightEdge, {x: 2.5, y: 3, z: 0}, null, "Right Atrium (RA)", "Receives deoxygenated blood.");
+
+        const aoPath = new THREE.CatmullRomCurve3([ new THREE.Vector3(-1, 1, 0), new THREE.Vector3(-1, 5, 0), new THREE.Vector3(1, 6, -1), new THREE.Vector3(3, 3, -2) ]);
+        buildAnatomy(new THREE.TubeGeometry(aoPath, 20, 0.9, 12, false), matLeftSurface, matLeftEdge, null, null, "Aorta", "Main artery to systemic circulation.");
+
+        const paPath = new THREE.CatmullRomCurve3([ new THREE.Vector3(1.5, 2, 1), new THREE.Vector3(0, 4.5, 1.5), new THREE.Vector3(-2.5, 4.5, -1) ]);
+        buildAnatomy(new THREE.TubeGeometry(paPath, 20, 0.8, 12, false), matRightSurface, matRightEdge, null, null, "Pulmonary Artery", "Artery to the lungs.");
+
+        buildAnatomy(new THREE.PlaneGeometry(6, 8), matLeftSurface, matLeftEdge, {x: 0, y: -1, z: 0}, {x: 0, y: Math.PI/2, z: 0}, "Ventricular Septum", "Wall dividing left and right sides.");
+        scene.add(heartGroup);
+
+        // --- DEFECT MESHES ---
+        const asdHole = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 0.8, 1, 16), matDefect);
+        asdHole.rotation.z = Math.PI / 2; asdHole.position.set(0, 3, -0.5);
+        asdHole.userData = { name: "Atrial Septal Defect (ASD)", desc: "Hole between atria. Blood shunts L -> R." };
+        asdHole.visible = false; heartGroup.add(asdHole); interactableObjects.push(asdHole);
+
+        const vsdHole = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 0.8, 2, 16), matDefect);
+        vsdHole.rotation.z = Math.PI / 2; vsdHole.position.set(0, -1, 0);
+        vsdHole.userData = { name: "Ventricular Septal Defect (VSD)", desc: "Hole between ventricles. Blood shunts L -> R." };
+        vsdHole.visible = false; heartGroup.add(vsdHole); interactableObjects.push(vsdHole);
+
+        const pdaTube = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 2, 16), matDefect);
+        pdaTube.rotation.x = Math.PI / 2; pdaTube.rotation.z = Math.PI / 4; pdaTube.position.set(0.5, 5.5, 0);
+        pdaTube.userData = { name: "Patent Ductus Arteriosus (PDA)", desc: "Connecting tube between Aorta and PA." };
+        pdaTube.visible = false; heartGroup.add(pdaTube); interactableObjects.push(pdaTube);
+
+        const coaPinch = new THREE.Mesh(new THREE.TorusGeometry(0.9, 0.2, 16, 32), matDefect);
+        coaPinch.rotation.y = Math.PI / 2; coaPinch.position.set(2.5, 4.5, -1.5);
+        coaPinch.userData = { name: "Coarctation of Aorta", desc: "Narrowing causing high upper body BP." };
+        coaPinch.visible = false; heartGroup.add(coaPinch); interactableObjects.push(coaPinch);
+
+        // --- ANIMATED BLOOD FLOW (PARTICLES) ---
+        const allParticles = [];
+        
+        function createFlow(curvePoints, color, count, speed, isShunt = false) {
+            const curve = new THREE.CatmullRomCurve3(curvePoints);
+            const geo = new THREE.SphereGeometry(0.15, 8, 8);
+            const mat = new THREE.MeshBasicMaterial({ color: color });
+            const group = new THREE.Group();
+            
+            for(let i=0; i<count; i++) {
+                const particle = new THREE.Mesh(geo, mat);
+                particle.userData = { t: i / count, speed: speed, curve: curve };
+                group.add(particle);
+                allParticles.push(particle);
+            }
+            group.userData = { isShunt: isShunt };
+            scene.add(group);
+            return group;
+        }
+
+        // Base Flows
+        const flowRight = createFlow([new THREE.Vector3(2.5, 6, 0), new THREE.Vector3(2.5, 3, 0), new THREE.Vector3(2.2, -1.5, 0.5), new THREE.Vector3(0, 4.5, 1.5), new THREE.Vector3(-3, 4.5, -1)], 0x33ccff, 20, 0.003); // Blue
+        const flowLeft = createFlow([new THREE.Vector3(-4, 3, -1), new THREE.Vector3(-2.5, 3, -1), new THREE.Vector3(-2, -2, 0), new THREE.Vector3(-1, 5, 0), new THREE.Vector3(3, 3, -2), new THREE.Vector3(3, -2, -2)], 0xff3366, 20, 0.003); // Red
+
+        // Shunt Flows (Hidden by default)
+        const flowASD = createFlow([new THREE.Vector3(-2.5, 3, -1), new THREE.Vector3(0, 3, -0.5), new THREE.Vector3(2.5, 3, 0)], 0xff3366, 8, 0.005, true);
+        const flowVSD = createFlow([new THREE.Vector3(-2, -1, 0), new THREE.Vector3(0, -1, 0), new THREE.Vector3(2.2, -1.5, 0.5)], 0xff3366, 8, 0.005, true);
+        const flowPDA = createFlow([new THREE.Vector3(0, 6, -0.5), new THREE.Vector3(0.5, 5.5, 0), new THREE.Vector3(0, 4.5, 1.5)], 0xff3366, 8, 0.005, true);
+        const flowTOF = createFlow([new THREE.Vector3(2.2, -1.5, 0.5), new THREE.Vector3(0, -1, 0), new THREE.Vector3(-1, 5, 0), new THREE.Vector3(3, 3, -2)], 0x9933ff, 12, 0.004, true); // Purple (mixed)
+
+        const allShunts = [flowASD, flowVSD, flowPDA, flowTOF];
+        allShunts.forEach(s => s.visible = false);
+
+        // --- RAYCASTER (HOVER) ---
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        container.addEventListener('mousemove', (event) => {
+            const rect = container.getBoundingClientRect();
+            mouse.x = ((event.clientX - rect.left) / container.clientWidth) * 2 - 1;
+            mouse.y = -((event.clientY - rect.top) / container.clientHeight) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(interactableObjects);
+
+            if (intersects.length > 0 && intersects[0].object.visible !== false) {
+                const data = intersects[0].object.userData;
+                tooltip.style.display = 'block';
+                tooltip.style.left = (event.clientX + 15) + 'px';
+                tooltip.style.top = (event.clientY + 15) + 'px';
+                tooltip.innerHTML = `<strong>${data.name}</strong>${data.desc}`;
+                document.body.style.cursor = 'pointer';
+            } else {
+                tooltip.style.display = 'none';
+                document.body.style.cursor = 'default';
+            }
+        });
+
+        // --- DROPDOWN LOGIC ---
+        const select = document.getElementById('pathology-select');
+        const guideContent = document.getElementById('study-guide-content');
+
+        select.addEventListener('change', (e) => {
+            const val = e.target.value;
+            guideContent.innerHTML = studyData[val].html;
+
+            // Reset UI
+            asdHole.visible = false; vsdHole.visible = false;
+            pdaTube.visible = false; coaPinch.visible = false;
+            allShunts.forEach(s => s.visible = false);
+
+            // Show Specifics
+            if (val === 'asd') { asdHole.visible = true; flowASD.visible = true; }
+            if (val === 'vsd') { vsdHole.visible = true; flowVSD.visible = true; }
+            if (val === 'pda') { pdaTube.visible = true; flowPDA.visible = true; }
+            if (val === 'tof') { vsdHole.visible = true; flowTOF.visible = true; }
+            if (val === 'coa') { coaPinch.visible = true; }
+        });
+
+        guideContent.innerHTML = studyData['normal'].html;
+
+        // --- RENDER LOOP ---
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            // Move Particles
+            allParticles.forEach(p => {
+                if (p.parent.visible) {
+                    p.userData.t += p.userData.speed;
+                    if (p.userData.t > 1) p.userData.t = 0;
+                    const pos = p.userData.curve.getPoint(p.userData.t);
+                    p.position.copy(pos);
+                }
+            });
+
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        });
+    </script>
+</body>
+</html>
